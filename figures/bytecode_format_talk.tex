@@ -1,0 +1,47 @@
+\centering
+\scriptsize
+\setlength{\tabcolsep}{2pt}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{cccccc}
+    \colorbox{green!17}{\strut magic} &
+    \colorbox{green!17}{\strut version} &
+    \colorbox{gray!12}{\strut string\_table\_size} &
+    \colorbox{gray!12}{\strut globals\_count} &
+    \colorbox{green!17}{\strut imports\_count} &
+    \colorbox{gray!12}{\strut publics\_count}
+\end{tabular}
+
+\vspace{0.35em}
+
+\begin{tabular}{cccc}
+    \colorbox{gray!12}{\strut string\_table} &
+    \colorbox{green!17}{\strut imports} &
+    \colorbox{green!17}{\strut publics} &
+    \colorbox{gray!12}{\strut code}
+\end{tabular}
+
+\vspace{0.5em}
+
+\footnotesize
+Зеленым отмечены поля и секции, добавленные или измененные по сравнению с исходным форматом
+
+\vspace{0.8em}
+
+\noindent
+\begin{minipage}[t]{0.46\linewidth}
+    \textbf{Новые записи}
+    \begin{itemize}
+        \item добавлены магическое число и версия формата байткода
+        \item \texttt{imports}: импортированные модули
+        \item \texttt{publics}: добавлен флаг для различия публичных функций и глобальных переменных
+    \end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.5\linewidth}
+    \textbf{Изменения в инструкциях}
+    \begin{itemize}
+        \item в \texttt{BEGIN\_CLOSURE} добавлен операнд с числом замкнутых переменных
+        \item добавлена инструкция \texttt{FAIL\_KEEP}
+        \item внешние ссылки кодируются отрицательными операндами через таблицу строк
+        \item вместо инструкций \texttt{read}/\texttt{write}/\texttt{length}/\texttt{string} вызываются непосредственно функции среды исполнения
+    \end{itemize}
+\end{minipage}

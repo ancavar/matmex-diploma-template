@@ -1,0 +1,79 @@
+\begin{tikzpicture}[
+    node distance=14mm and 10mm,
+    stage/.style={
+        draw,
+        rounded corners=2pt,
+        thick,
+        align=center,
+        minimum height=11mm,
+        text width=20mm,
+        fill=gray!8
+    },
+    vmstage/.style={
+        draw,
+        rounded corners=2pt,
+        thick,
+        align=center,
+        minimum height=30mm,
+        text width=56mm,
+        fill=gray!8
+    },
+    innerbox/.style={
+        draw,
+        align=center,
+        fill=white,
+        inner sep=3pt,
+        text width=46mm
+    },
+    cell/.style={
+        draw,
+        minimum height=6mm,
+        minimum width=12mm,
+        align=center,
+        fill=white,
+        font=\ttfamily\scriptsize
+    },
+    tool/.style={
+        draw,
+        rounded corners=2pt,
+        align=center,
+        minimum height=8mm,
+        text width=32mm,
+        fill=white
+    },
+    flow/.style={->, thick},
+    attach/.style={->, dashed, semithick}
+]
+
+\node[stage] (lama) {\texttt{.lama}};
+\node[stage, right=of lama, text width = 30mm] (compiler) {Компилятор\\байткода};
+\node[stage, right=of compiler,] (bc) {\texttt{.bc}};
+\node[vmstage, right=of bc] (vm) {Виртуальная машина};
+\node[] at ([yshift=-11mm]vm.center) 
+(ops)
+{
+    \begin{tikzpicture}[node distance=0mm]
+        \node[cell] (c1) {insn$_1$};
+        \node[cell, right=0mm of c1] (c2) {insn$_2$};
+        \node[cell, right=0mm of c2, minimum width=8mm] (c3) {$\cdots$};
+        \node[cell, right=0mm of c3] (c4) {insn$_n$};
+    \end{tikzpicture}
+};
+
+\draw[flow] (lama) -- (compiler);
+\draw[flow] (compiler) -- (bc);
+\draw[flow] (bc) -- (vm);
+
+\node[tool, below=16mm of lama, fill=green!12] (tool-lama) {\textsc{AFL++} +\\Grammarinator};
+\node[tool, below=16mm of bc, fill=orange!14] (tool-bc) {\textsc{AFL++}};
+\node[tool, below=16mm of vm, fill=blue!10] (tool-cbmc) {\textsc{CBMC}};
+
+\draw[attach] (tool-lama) -- (lama);
+\draw[attach] (tool-bc) -- (bc);
+\draw[attach] (tool-cbmc) -- (ops);
+
+\node[font=\small, align=center, below=1mm of tool-lama] {грамматический\\фаззинг};
+\node[font=\small, align=center, below=1mm of tool-bc] {прямой фаззинг\\байткода};
+\node[font=\small, align=center, below=1mm of tool-cbmc] {проверка инвариантов\\декодера и VM};
+
+\end{tikzpicture}

@@ -1,0 +1,148 @@
+\begin{tikzpicture}[
+    x=1cm,
+    y=1cm,
+    outer/.style={
+        draw,
+        rounded corners=2pt,
+        semithick,
+        inner sep=0pt
+    },
+    title/.style={
+        font=\small\bfseries,
+        anchor=west
+    },
+    source/.style={
+        draw,
+        line width=0.35pt,
+        draw=black!30,
+        minimum width=37mm,
+        minimum height=24mm,
+        fill=white
+    },
+    phase/.style={
+        draw,
+        rounded corners=2pt,
+        semithick,
+        align=center,
+        text width=30mm,
+        minimum height=18mm,
+        inner sep=4pt,
+        fill=blue!10,
+        font=\scriptsize
+    },
+    codecell/.style={
+        draw,
+        semithick,
+        align=left,
+        text width=34mm,
+        minimum height=4.1mm,
+        inner sep=2pt,
+        font=\tiny
+    },
+    codefunc/.style={codecell, fill=orange!18},
+    codeoperand/.style={codecell, fill=orange!6},
+    markercode/.style={codecell, fill=gray!8, align=center},
+    tablecell/.style={
+        draw,
+        semithick,
+        align=center,
+        minimum height=4.8mm,
+        inner sep=1.5pt,
+        font=\tiny
+    },
+    header/.style={
+        draw,
+        semithick,
+        align=center,
+        fill=gray!12,
+        minimum height=4.8mm,
+        inner sep=1.5pt,
+        font=\tiny\bfseries
+    },
+    flow/.style={->, semithick}
+]
+
+\node[outer, minimum width=160mm, minimum height=115mm] (frame) at (0,0) {};
+\node[title] at ($(frame.north west)+(5mm,-5mm)$)
+    {Обработка одного байткодного юнита};
+
+\node[source] (bc) at (-5.45,1.15) {};
+\node[anchor=north west, inner sep=0pt] at ($(bc.north west)+(0.8mm,-0.8mm)$) {
+    \begin{tikzpicture}[x=1mm,y=-1mm]
+        \clip (0,0) rectangle (34.4,22.4);
+        \node[
+            anchor=north west,
+            align=left,
+            font=\ttfamily\fontsize{5.0}{5.6}\selectfont
+        ] at (0.1,0.25)
+            {PUBLIC ("main")\\
+             LABEL ("main")\\
+             BEGIN ("main", 2, 2, [], [], [])\\
+             LINE (32)\\
+             CALL ("Lread", 0, false)\\
+             ST (Global ("z"))\\
+             DROP\\
+             CONST (1)\\
+             CONST (2)\\
+             CONST (3)\\
+             SEXP ("Nil", 0)\\
+             SEXP ("Cons", 2)};
+    \end{tikzpicture}
+};
+
+\node[font=\small\bfseries, align=center] (convtitle) at (-0.20,2.95)
+    {\texttt{converter.c}};
+\node[phase, below=1mm of convtitle] (conv)
+    {декодирование\\проверка границ\\запись релокаций};
+
+\node[codefunc] (ir1) at (-0.95,-0.95)
+    {\texttt{func: op\_begin (main\_1)}};
+\node[codefunc, below=0pt of ir1] (ir2)
+    {\texttt{func: op\_const}};
+\node[codeoperand, below=0pt of ir2] (ir3)
+    {\texttt{num: 42}};
+\node[codefunc, below=0pt of ir3] (ir4)
+    {\texttt{func: op\_call}};
+\node[codeoperand, below=0pt of ir4] (ir5)
+    {\texttt{target: f}};
+\node[codeoperand, below=0pt of ir5] (ir6)
+    {\texttt{num: n}};
+\node[codefunc, below=0pt of ir6] (ir7)
+    {следующий обработчик};
+\node[markercode, below=0pt of ir7] (ir8)
+    {$\cdots$};
+\node[codefunc, below=0pt of ir8] (ir9)
+    {\texttt{func: op\_begin (f)}};
+\node[markercode, below=0pt of ir9] (ir10)
+    {$\cdots$ тело функции};
+\node[codefunc, below=0pt of ir10] (ir11)
+    {\texttt{func: op\_end}};
+
+\node[header, text width=13mm] (rh1) at (3.55,-0.95)
+    {\texttt{patch\_idx}};
+\node[header, text width=17mm, anchor=west] (rh2) at (rh1.east)
+    {\texttt{name}};
+\node[header, text width=16mm, anchor=west] (rh3) at (rh2.east)
+    {\texttt{kind}};
+
+\node[tablecell, text width=13mm, below=0pt of rh1] (r11) {3};
+\node[tablecell, text width=17mm, anchor=west] (r12) at (r11.east) {\texttt{NULL}};
+\node[tablecell, text width=16mm, anchor=west] (r13) at (r12.east) {\texttt{INTERNAL}};
+
+\node[tablecell, text width=13mm, below=0pt of r11] (r21) {6};
+\node[tablecell, text width=17mm, anchor=west] (r22) at (r21.east) {\texttt{"asd"}};
+\node[tablecell, text width=16mm, anchor=west] (r23) at (r22.east) {\texttt{UNIT}};
+
+\node[tablecell, text width=13mm, below=0pt of r21] (r31) {$\cdots$};
+\node[tablecell, text width=17mm, anchor=west] (r32) at (r31.east) {$\cdots$};
+\node[tablecell, text width=16mm, anchor=west] (r33) at (r32.east) {$\cdots$};
+
+\node[tablecell, text width=13mm, below=0pt of r31] (r41) {120};
+\node[tablecell, text width=17mm, anchor=west] (r42) at (r41.east) {\texttt{"printf"}};
+\node[tablecell, text width=16mm, anchor=west] (r43) at (r42.east) {\texttt{FFI}};
+
+\draw[flow] (bc.east) -- (conv.west);
+\draw[flow] (conv.south) -- ++(0,-4mm) -| (ir1.north);
+\draw[flow] (conv.south) -- ++(0,-4mm) -| (rh1.north);
+
+\end{tikzpicture}

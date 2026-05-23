@@ -1,0 +1,75 @@
+\begin{tikzpicture}[
+    x=1cm,
+    y=1cm,
+    module/.style={
+        draw,
+        rounded corners=2pt,
+        semithick,
+        align=center,
+        minimum height=17mm,
+        text width=31mm,
+        fill=gray!8,
+        font=\small
+    },
+    owner/.style={
+        draw,
+        rounded corners=2pt,
+        semithick,
+        align=center,
+        minimum height=17mm,
+        text width=31mm,
+        fill=gray!14,
+        font=\small
+    },
+    boundary/.style={
+        draw,
+        rounded corners=2pt,
+        semithick,
+        align=center,
+        minimum height=17mm,
+        text width=31mm,
+        fill=gray!8,
+        font=\small
+    },
+    artifact/.style={
+        draw,
+        rounded corners=2pt,
+        line width=0.35pt,
+        draw=black!35,
+        align=center,
+        minimum height=17mm,
+        text width=31mm,
+        fill=orange!14,
+        font=\small
+    },
+    flow/.style={->, semithick},
+    attach/.style={->, dashed, semithick}
+]
+
+\node[boundary] (cli) at (0,0) {\texttt{lama.c}\\консольная\\утилита};
+\node[owner] (vm) at (4.4,0) {\texttt{vm.c}};
+
+\node[module] (loader) at (9.3,2.5) {\texttt{loader.c}};
+\node[module] (bytecode) at (14.3,2.5) {\texttt{bytecode.c}\\\texttt{bytecode.h}};
+
+\node[module] (converter) at (10.5,0) {\texttt{converter.c}};
+\node[module] (ops) at (18.1,0) {\texttt{ops.c}\\обработчики};
+
+\node[module] (symbols) at (10.5,-2.5) {\texttt{symbols.c}\\публичные\\символы};
+\node[module] (ffi) at (14.6,-2.5) {\texttt{ffi.c}\\внешние\\вызовы};
+\node[boundary] (execenv) at (18.1,-2.5) {среда\\выполнения};
+
+\draw[flow] (cli) -- (vm);
+\draw[flow] (vm) -- node[pos=0.58, above left, align=center, fill=white, inner sep=1pt, font=\scriptsize] {загрузка\\юнитов} (loader);
+\draw[flow] (loader) -- node[midway, above, align=center, fill=white, inner sep=1pt, font=\scriptsize] {чтение\\байткода} (bytecode);
+\draw[flow] (vm) -- node[pos=0.56, above, align=center, fill=white, inner sep=1pt, font=\scriptsize] {декодирование\\и связывание} (converter);
+\draw[flow] (converter) --  (ops);
+\draw[flow] (converter) -- (symbols);
+\draw[flow] (converter) -- (ffi);
+\draw[flow] (ops) -- (execenv);
+\draw[flow] (vm.south) -- ++(0,-3.35)
+    node[pos=0.45, right, align=center, fill=white, inner sep=1pt, font=\scriptsize]
+    {подготовка\\сборщика мусора}
+    -| (execenv.south);
+
+\end{tikzpicture}

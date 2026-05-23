@@ -1,0 +1,64 @@
+\begin{tikzpicture}[
+    x=1mm,
+    y=1mm,
+    tool/.style={
+        draw,
+        rounded corners=2pt,
+        thick,
+        align=center,
+        minimum height=10mm,
+        text width=34mm,
+        fill=green!10
+    },
+    box/.style={
+        draw,
+        rounded corners=2pt,
+        thick,
+        align=center,
+        minimum height=10mm,
+        text width=26mm,
+        fill=gray!8
+    },
+    smallbox/.style={
+        draw,
+        rounded corners=2pt,
+        align=center,
+        minimum height=9mm,
+        text width=21mm,
+        fill=white
+    },
+    flow/.style={->, thick},
+    feedback/.style={->, dashed, semithick}
+]
+
+\node[tool, fill=orange!14] (fuzzer) at (0,0) {\textsc{AFL++} +\\Grammarinator};
+\node[box] (src) at (30,0) {Программа\\\texttt{.lama}};
+
+\node[smallbox] (nativec) at (56,12) {Driver.exe\\\texttt{-o}};
+\node[smallbox] (native) at (78,12) {Нативное\\исполнение};
+
+\node[smallbox] (bcc) at (56,-12) {Driver.exe\\\texttt{-b}};
+\node[smallbox] (bc) at (78,-12) {\texttt{.bc}};
+\node[smallbox] (vm) at (100,-12) {VM\\in-process};
+
+\node[box] (cmp) at (111,0) {Сравнение\\результатов};
+
+\draw[flow] (fuzzer) -- (src);
+\draw[flow] (src) -- (nativec);
+\draw[flow] (nativec) -- (native);
+\draw[flow] (src) -- (bcc);
+\draw[flow] (bcc) -- (bc);
+\draw[flow] (bc) -- (vm);
+\draw[flow] (native.east) -- ++(6,0) |- (cmp.north west);
+\draw[flow] (vm.east) -- ++(6,0) |- (cmp.south west);
+
+\draw[feedback] (vm.south) .. controls +(0,-14) and +(0,-14) ..
+    node[below, font=\small] {покрытие} (fuzzer.south);
+\draw[feedback] (cmp.north) .. controls +(0,16) and +(0,16) ..
+    node[above, font=\small] {падение / расхождение} (fuzzer.north);
+
+\draw[dashed, thick, rounded corners=2pt]
+    (42,22) rectangle (125,-22);
+\node[font=\small, align=center] at (84,25) {Дифференциальный стенд};
+
+\end{tikzpicture}

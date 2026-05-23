@@ -1,0 +1,44 @@
+@startuml
+hide footbox
+skinparam backgroundColor transparent
+skinparam defaultFontName "CMU Serif"
+skinparam sequence {
+    ParticipantMinSize 110
+    ParticipantTextAlignment center
+    ArrowColor #222222
+    LifeLineBorderColor #888888
+    LifeLineBackgroundColor transparent
+    ParticipantBorderColor #222222
+    ParticipantBackgroundColor #F2F2F2
+    ActorBorderColor #222222
+    ActorBackgroundColor #F2F2F2
+}
+
+actor "пользователь" as User
+participant "lama.c" as CLI
+participant "vm.c" as VM
+participant "loader.c\nbytecode.c" as Loader
+participant "converter.c" as Conv
+participant "ops.c\nruntime" as Exec #E8E8FF
+
+User -> CLI: ./lama.exe [opts]\n<unit | file.bc> [args]
+activate CLI
+CLI -> VM: vm_create
+activate VM
+VM -> Loader: load
+activate Loader
+Loader --> VM: загруженные юниты
+deactivate Loader
+VM -> Conv: decode
+activate Conv
+Conv -> Conv: проверка,\nсвязывание,\nрелокация
+Conv --> VM: поток инструкций
+deactivate Conv
+CLI -> VM: vm_run
+VM -> Exec: исполнение
+activate Exec
+deactivate Exec
+VM --> CLI: завершение
+deactivate VM
+deactivate CLI
+@enduml

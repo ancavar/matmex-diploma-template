@@ -1,0 +1,78 @@
+\begin{tikzpicture}[
+    font=\small,
+    lifeline/.style={densely dotted, draw=black!55},
+    actor/.style={align=center},
+    participant/.style={
+        draw=black!75,
+        fill=gray!8,
+        minimum width=26mm,
+        minimum height=8mm,
+        align=center,
+        inner sep=2pt
+    },
+    execparticipant/.style={
+        participant,
+        fill=blue!10
+    },
+    activation/.style={
+        draw=black!75,
+        fill=white,
+        minimum width=3mm
+    },
+    msg/.style={->, semithick},
+    ret/.style={->, semithick, dashed, draw=black!70},
+    msglabel/.style={midway, above, fill=white, inner sep=1pt, align=center},
+    cmdlabel/.style={midway, below, fill=white, inner sep=1pt, align=center},
+    retlabel/.style={midway, below, fill=white, inner sep=1pt, align=center, text=black!80}
+]
+
+\coordinate (userTop) at (0,0);
+\coordinate (cliTop) at (2.9,0);
+\coordinate (vmTop) at (5.8,0);
+\coordinate (loaderTop) at (8.7,0);
+\coordinate (convTop) at (11.6,0);
+\coordinate (execTop) at (14.5,0);
+
+\node[actor] (user) at ($(userTop)+(0,-0.25)$) {пользователь};
+\draw (userTop) ++(0,0.62) circle (0.12);
+\draw (userTop) ++(0,0.50) -- ++(0,-0.38);
+\draw (userTop) ++(-0.22,0.28) -- ++(0.44,0);
+\draw (userTop) ++(0,0.12) -- ++(-0.22,-0.30);
+\draw (userTop) ++(0,0.12) -- ++(0.22,-0.30);
+
+\node[participant] (cli) at (cliTop) {\texttt{lama.c}\\CLI};
+\node[participant] (vm) at (vmTop) {\texttt{vm.c}};
+\node[participant] (loader) at (loaderTop) {\texttt{loader.c}\\\texttt{bytecode.c}};
+\node[participant] (conv) at (convTop) {\texttt{converter.c}};
+\node[execparticipant] (exec) at (execTop) {\texttt{ops.c}\\среда выполнения};
+
+\foreach \x in {0,2.9,5.8,8.7,11.6,14.5} {
+    \draw[lifeline] (\x,-0.45) -- (\x,-9.0);
+}
+
+\draw[activation] (2.82,-1.15) rectangle (2.98,-8.5);
+\draw[activation] (5.72,-2.25) rectangle (5.88,-8.15);
+\draw[activation] (8.62,-3.45) rectangle (8.78,-4.2);
+\draw[activation] (11.52,-5.0) rectangle (11.68,-5.75);
+\draw[activation] (14.42,-7.25) rectangle (14.58,-8.0);
+
+\draw[msg] (0,-1.2) -- (2.82,-1.2)
+    node[cmdlabel] {\texttt{./lama.exe ...}};
+\draw[msg] (2.98,-2.55) -- (5.72,-2.55)
+    node[msglabel] {\texttt{vm\_create}};
+\draw[msg] (5.88,-3.5) -- (8.62,-3.5)
+    node[msglabel] {\texttt{load}};
+\draw[ret] (8.62,-4.15) -- (5.88,-4.15)
+    node[retlabel] {загруженные юниты};
+\draw[msg] (5.88,-5.05) -- (11.52,-5.05)
+    node[msglabel] {\texttt{decode}};
+\draw[ret] (11.52,-5.7) -- (5.88,-5.7)
+    node[retlabel] {массив инструкций};
+\draw[msg] (2.98,-6.75) -- (5.72,-6.75)
+    node[msglabel] {\texttt{vm\_run}};
+\draw[msg] (5.88,-7.3) -- (14.42,-7.3)
+    node[msglabel] {исполнение};
+\draw[ret] (14.42,-7.95) -- (5.88,-7.95)
+    node[retlabel] {завершение};
+
+\end{tikzpicture}

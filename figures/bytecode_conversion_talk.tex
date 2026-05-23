@@ -1,0 +1,126 @@
+\begin{tikzpicture}[
+    x=1cm,
+    y=1cm,
+    source/.style={
+        draw,
+        line width=0.35pt,
+        draw=black!30,
+        minimum width=37mm,
+        minimum height=24mm,
+        fill=white
+    },
+    sourceback/.style={
+        draw,
+        line width=0.35pt,
+        draw=black!25,
+        minimum width=37mm,
+        minimum height=24mm,
+        fill=gray!6
+    },
+    linkbox/.style={
+        draw,
+        rounded corners=2pt,
+        semithick,
+        align=center,
+        text width=28mm,
+        minimum height=11mm,
+        inner sep=3pt,
+        fill=gray!10,
+        font=\scriptsize
+    },
+    insn/.style={
+        draw,
+        semithick,
+        align=left,
+        text width=16mm,
+        minimum height=4.2mm,
+        inner sep=1pt,
+        fill=orange!18,
+        font=\fontsize{5.4}{5.9}\selectfont\ttfamily
+    },
+    operand/.style={
+        draw,
+        semithick,
+        align=left,
+        text width=16mm,
+        minimum height=4.2mm,
+        inner sep=1pt,
+        fill=orange!6,
+        font=\fontsize{5.4}{5.9}\selectfont\ttfamily
+    },
+    operandwide/.style={
+        operand
+    },
+    marker/.style={
+        draw,
+        semithick,
+        align=center,
+        text width=16mm,
+        minimum height=4.2mm,
+        inner sep=1pt,
+        fill=gray!8,
+        font=\fontsize{5.4}{5.9}\selectfont\ttfamily
+    },
+    flow/.style={->, semithick}
+]
+
+\node[sourceback] at (-4.23,0.44) {};
+\node[sourceback] at (-4.34,0.32) {};
+\node[source] (bc) at (-4.45,0.2) {};
+\node[anchor=north west, inner sep=0pt] at ($(bc.north west)+(0.8mm,-0.8mm)$) {
+    \begin{tikzpicture}[x=1mm,y=-1mm]
+        \clip (0,0) rectangle (34.4,22.4);
+        \node[
+            anchor=north west,
+            align=left,
+            font=\ttfamily\fontsize{5.0}{5.6}\selectfont
+        ] at (0.1,0.25)
+            {PUBLIC ("main")\\
+             LABEL ("main")\\
+             BEGIN ("main", 2, 2, [], [], [])\\
+             LD (Global ("x"))\\
+             CONST (3)\\
+             CALL ("func", 0, false)\\
+             ST (Global ("z"))\\
+             BINOP ("+")\\
+             DROP\\
+             ...};
+    \end{tikzpicture}
+};
+
+\coordinate (convStart) at ($(bc.east)+(0.25,0)$);
+\coordinate (convEnd) at (-0.20,0.2);
+\draw[flow] (convStart) -- (convEnd)
+    node[midway, above, font=\small] {конвертер};
+
+\node[linkbox] (links) at (-1.15,-2.35)
+    {опережающие ссылки\\
+     соответствие индексов};
+
+\node[insn] (c1) at (1.45,1.30) {\texttt{op\_begin}};
+\node[operand, anchor=west] (a1b) at (c1.east) {\texttt{2}};
+\node[operand, anchor=west] (a1c) at (a1b.east) {\texttt{2}};
+
+\node[insn, below=0pt of c1] (c2) {\texttt{op\_ld\_glo}};
+\node[operand, anchor=west] (a2) at (c2.east) {\texttt{\&globals[0]}};
+
+\node[insn, below=0pt of c2] (c3) {\texttt{op\_const}};
+\node[operand, anchor=west] (a3) at (c3.east) {\texttt{3}};
+
+\node[insn, below=0pt of c3] (c4) {\texttt{op\_call}};
+\node[operand, anchor=west] (a4a) at (c4.east) {\texttt{func}};
+\node[operand, anchor=west] (a4b) at (a4a.east) {\texttt{0}};
+
+\node[insn, below=0pt of c4] (c5) {\texttt{op\_st\_glo}};
+\node[operand, anchor=west] (a5) at (c5.east) {\texttt{\&globals[2]}};
+
+\node[insn, below=0pt of c5] (c6) {\texttt{op\_add}};
+
+\node[insn, below=0pt of c6] (c7) {\texttt{op\_drop}};
+
+\node[marker, anchor=north west] (dots) at (c7.south west) {\texttt{...}};
+
+\draw[flow] (convEnd) -- (links.north);
+\draw[flow] (convEnd) -- (c3.west);
+
+\end{tikzpicture}

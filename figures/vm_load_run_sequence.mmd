@@ -1,0 +1,56 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "background": "transparent",
+    "fontFamily": "CMU Serif",
+    "actorBkg": "#F2F2F2",
+    "actorBorder": "#222222",
+    "actorTextColor": "#222222",
+    "actorLineColor": "#888888",
+    "signalColor": "#222222",
+    "signalTextColor": "#222222",
+    "activationBkgColor": "#FFFFFF",
+    "activationBorderColor": "#222222",
+    "labelBoxBkgColor": "#F2F2F2",
+    "labelBoxBorderColor": "#222222"
+  },
+  "sequence": {
+    "showSequenceNumbers": false,
+    "mirrorActors": false,
+    "bottomMarginAdj": 4,
+    "actorMargin": 45,
+    "messageMargin": 38,
+    "boxMargin": 8,
+    "boxTextMargin": 4,
+    "noteMargin": 8
+  }
+}}%%
+sequenceDiagram
+    actor User as пользователь
+    participant CLI as lama.c<br/>CLI
+    participant VM as vm.c
+    participant Loader as loader.c<br/>bytecode.c
+    participant Conv as converter.c
+    participant Exec as ops.c<br/>runtime
+
+    %% Full CLI form: ./lama.exe [opts] <unit | file.bc> [args]
+    User->>CLI: ./lama.exe opts<br/>unit/file.bc args
+    activate CLI
+    CLI->>VM: vm_create
+    activate VM
+    VM->>Loader: load
+    activate Loader
+    Loader-->>VM: загруженные юниты
+    deactivate Loader
+    VM->>Conv: decode
+    activate Conv
+    Conv->>Conv: проверка,<br/>связывание,<br/>релокация
+    Conv-->>VM: поток инструкций
+    deactivate Conv
+    CLI->>VM: vm_run
+    VM->>Exec: исполнение
+    activate Exec
+    deactivate Exec
+    VM-->>CLI: завершение
+    deactivate VM
+    deactivate CLI

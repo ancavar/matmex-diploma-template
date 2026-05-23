@@ -1,0 +1,120 @@
+\begin{tikzpicture}[
+    x=1cm,
+    y=1cm,
+    entrycell/.style={
+        draw,
+        semithick,
+        align=left,
+        text width=31mm,
+        minimum height=5.8mm,
+        inner sep=2pt,
+        font=\scriptsize
+    },
+    codecell/.style={
+        draw,
+        semithick,
+        align=left,
+        text width=39mm,
+        minimum height=5.8mm,
+        inner sep=2pt,
+        font=\scriptsize
+    },
+    entryfunc/.style={entrycell, fill=orange!18},
+    entryoperand/.style={entrycell, fill=orange!6},
+    codefunc/.style={codecell, fill=orange!18},
+    codeoperand/.style={codecell, fill=orange!6},
+    markerentry/.style={entrycell, fill=gray!8, align=center},
+    markercode/.style={codecell, fill=gray!8, align=center},
+    handler/.style={
+        draw,
+        rounded corners=2pt,
+        semithick,
+        align=left,
+        text width=47mm,
+        minimum height=8mm,
+        inner sep=4pt,
+        fill=white,
+        font=\scriptsize
+    },
+    ipbox/.style={
+        draw,
+        rounded corners=2pt,
+        semithick,
+        align=center,
+        minimum width=8mm,
+        minimum height=5mm,
+        inner sep=4pt,
+        fill=gray!8,
+        font=\scriptsize
+    },
+    flow/.style={->, semithick},
+    targetflow/.style={->, semithick, rounded corners=4pt},
+    returnflow/.style={->, semithick, densely dashed}
+]
+
+\node[font=\small\bfseries, align=center] at (-4.3,0.85) {\\\texttt{entry\_points}};
+\node[font=\small\bfseries, align=center] at (0.75,0.85) {\\\texttt{all\_code}};
+\node[font=\small\bfseries] at (8.1,0.65) {\texttt{ops.c}};
+
+\node[entryfunc] (entrycall1) at (-4.3,0) {\texttt{func: op\_call}};
+\node[entryoperand, below=0pt of entrycall1] (entrytarget1) {\texttt{target: main\_1}};
+\node[entryoperand, below=0pt of entrytarget1] (entryargs1) {\texttt{num: 0}};
+\node[entryfunc,    below=0pt of entryargs1] (entrydrop1) {\texttt{func: op\_drop}};
+\node[markerentry,  below=0pt of entrydrop1] (entrygap) {$\cdots$};
+\node[entryfunc,    below=0pt of entrygap]   (entrycalln) {\texttt{func: op\_call}};
+\node[entryoperand, below=0pt of entrycalln] (entrytargetn) {\texttt{target: main\_n}};
+\node[entryoperand, below=0pt of entrytargetn] (entryargsn) {\texttt{num: 0}};
+\node[entryfunc,    below=0pt of entryargsn] (entrydropn) {\texttt{func: op\_drop}};
+\node[entryfunc,    below=0pt of entrydropn] (entryeof) {\texttt{func: op\_eof}};
+
+
+\node[codefunc] (mainbegin) at (0.75,0) {\texttt{func: op\_begin (main\_1)}};
+\node[codefunc,    below=0pt of mainbegin]  (constop) {\texttt{func: op\_const}};
+\node[codeoperand, below=0pt of constop]    (constarg) {\texttt{num: 42}};
+\node[codefunc,    below=0pt of constarg]   (callop) {\texttt{func: op\_call}};
+\node[codeoperand, below=0pt of callop]     (calltarget) {\texttt{target: f}};
+\node[codeoperand, below=0pt of calltarget] (callargs) {\texttt{num: n}};
+\node[codefunc,    below=0pt of callargs]   (aftercall) {следующий обработчик};
+\node[markercode,  below=0pt of aftercall]  (gap2) {$\cdots$};
+\node[codefunc,    below=0pt of gap2]       (fbegin) {\texttt{func: op\_begin (f)}};
+\node[markercode,  below=0pt of fbegin]     (fbody) {$\cdots$ тело функции};
+\node[codefunc,    below=0pt of fbody]      (endop) {\texttt{func: op\_end}};
+
+\node[ipbox] (ip) at ($(callop.west)+(-0.9,0)$) {\texttt{ip}};
+
+\node[handler] (hcall) at (8.1,-1.25)
+    {\texttt{void op\_call(DECL\_STATE) \{}\\
+     \texttt{\hspace*{1.2em}ip++;}\\
+     \texttt{\hspace*{1.2em}target = ip->target; ip++;}\\
+     \texttt{\hspace*{1.2em}n\_args = ip->num; ip++;}\\
+     \texttt{\hspace*{1.2em}PUSH\_FRAME(..., ip,}\\
+     \texttt{\hspace*{2.4em}sp + n\_args);}\\
+     \texttt{\hspace*{1.2em}ip = target;}\\
+     \texttt{\hspace*{1.2em}DISPATCH\_JUMP();}\\
+     \texttt{\}}};
+
+\node[font=\large] (handlergap) at (8.1,-3.45) {$\cdots$};
+
+\node[handler] (hconst) at (8.1,-4.35)
+    {\texttt{void op\_const(DECL\_STATE) \{...\}}};
+
+\node[handler] (hbegin) at (8.1,-5.50)
+    {\texttt{void op\_begin(DECL\_STATE) \{...\}}};
+
+\node[handler] (hend) at (8.1,-6.65)
+    {\texttt{void op\_end(DECL\_STATE) \{...\}}};
+
+\draw[flow] (ip.east) -- (callop.west);
+\draw[flow] (callop.east) -- (hcall.west);
+\draw[flow] (mainbegin.east) -- (hbegin.west);
+\draw[flow] (constop.east) -- (hconst.west);
+\draw[flow] (endop.east) -- (hend.west);
+
+\draw[targetflow] (entrytarget1.east) -- (mainbegin.west);
+\draw[targetflow] (entrygap.east) -- (gap2.west);
+
+\draw[targetflow] (entrytargetn.east) -- (gap2.west);
+\draw[targetflow] (calltarget.east) -- ++(0.55,0) |- (fbegin.east);
+\draw[returnflow] (hend.west) to[out=180,in=0] (aftercall.east);
+
+\end{tikzpicture}

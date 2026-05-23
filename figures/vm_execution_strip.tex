@@ -1,0 +1,68 @@
+\begin{tikzpicture}[
+    x=1cm,
+    y=1cm,
+    stage/.style={
+        draw,
+        rounded corners=2pt,
+        semithick,
+        align=center,
+        minimum width=30mm,
+        minimum height=31mm,
+        text width=28mm,
+        fill=gray!8,
+        font=\small
+    },
+    execenv/.style={
+        stage,
+        fill=blue!10
+    },
+    number/.style={
+        circle,
+        draw,
+        semithick,
+        fill=white,
+        inner sep=1.2pt,
+        minimum size=6.5mm,
+        font=\small\bfseries
+    },
+    flow/.style={->, semithick}
+]
+
+\node[stage] (start) at (0,0) {
+    запуск\\[1mm]
+    \texttt{lama.c}
+};
+\node[stage] (load) at (3.6,0) {
+    загрузка\\модулей\\[1mm]
+    \texttt{loader.c}\\
+    \texttt{bytecode.c}
+};
+\node[stage] (prepare) at (7.2,0) {
+    подготовка\\программы\\[1mm]
+    \texttt{converter.c}\\
+    \texttt{symbols.c}\\
+    \texttt{ffi.c}
+};
+\node[execenv] (run) at (10.8,0) {
+    запуск\\VM\\[1mm]
+    \texttt{vm.c}\\
+    среда выполнения
+};
+\node[execenv] (exec) at (14.4,0) {
+    исполнение\\инструкций\\[1mm]
+    \texttt{ops.c}\\
+    среда выполнения
+};
+
+\node[number] at ([yshift=2mm]start.north) {1};
+\node[number] at ([yshift=2mm]load.north) {2};
+\node[number] at ([yshift=2mm]prepare.north) {3};
+\node[number] at ([yshift=2mm]run.north) {4};
+\node[number] at ([yshift=2mm]exec.north) {5};
+
+\draw[flow] (start) -- (load);
+\draw[flow] (load) -- (prepare);
+\draw[flow] (prepare) -- (run);
+\draw[flow] (run) -- (exec);
+
+\end{tikzpicture}

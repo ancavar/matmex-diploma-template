@@ -1,0 +1,145 @@
+\begin{tikzpicture}[
+    section/.style={
+        draw,
+        semithick,
+        align=center,
+        minimum height=14mm,
+        minimum width=28mm,
+        text width=24mm,
+        outer sep=0pt,
+        font=\small
+    },
+    header/.style={section, fill=gray!12},
+    block/.style={section, fill=gray!12},
+    codeblock/.style={section, fill=gray!12},
+    field/.style={
+        draw,
+        semithick,
+        align=center,
+        minimum height=12mm,
+        minimum width=32mm,
+        text width=29mm,
+        outer sep=0pt,
+        fill=gray!12,
+        font=\scriptsize
+    },
+    detail/.style={
+        draw,
+        semithick,
+        align=center,
+        minimum height=9mm,
+        minimum width=34mm,
+        text width=31mm,
+        outer sep=0pt,
+        fill=gray!12,
+        font=\scriptsize
+    },
+    widefield/.style={
+        draw,
+        semithick,
+        align=center,
+        minimum height=12mm,
+        minimum width=45mm,
+        text width=42mm,
+        outer sep=0pt,
+        fill=gray!12,
+        font=\scriptsize
+    },
+    codefield/.style={widefield, fill=green!17},
+    note/.style={
+        draw,
+        semithick,
+        align=center,
+        rounded corners=2pt,
+        minimum height=9mm,
+        minimum width=64mm,
+        text width=60mm,
+        fill=gray!12,
+        font=\scriptsize
+    },
+    attach/.style={->, semithick},
+    weakattach/.style={->, semithick}
+]
+
+\path coordinate (mainaux) at (0,0)
+    node[
+        header,
+        anchor=west,
+        label={[name=main-l1, align=center, font=\small, text width=31mm]center:
+            {заголовок\\24 байта}}
+    ] (header) at (mainaux) {}
+    node[
+        block,
+        anchor=west,
+        label={[name=main-l2, align=center, font=\footnotesize, text width=31mm]center:
+            {таблица строк\\переменный размер}}
+    ] (strings) at (header.east) {}
+    node[
+        section,
+        fill=green!17,
+        anchor=west,
+        label={[name=main-l3, align=center, font=\small, text width=31mm]center:
+            {импорты\\$n_i \times 4$ байта}}
+    ] (imports) at (strings.east) {}
+    node[
+        section,
+        fill=green!17,
+        anchor=west,
+        label={[name=main-l4, align=center, font=\footnotesize, text width=31mm]center:
+            {публичные \\ символы\\$n_p \times 9$ байт}}
+    ] (publics) at (imports.east) {}
+    node[
+        codeblock,
+        anchor=west,
+        minimum width = 12mm,
+        label={[name=main-l5, align=center, font=\small, text width=16mm]center:
+            {байткод \\ до \texttt{0xFF}}}
+    ] (code) at (publics.east) {};
+
+\node[detail, fill=green!17] (h0) at ($(header.west)+(-2.8,2.25)$)
+{магическое число: \\ \texttt{uint8[4]}};
+\node[detail, fill=green!17, below=0pt of h0] (h1)
+{версия: \texttt{int32}};
+\node[detail, below=0pt of h1] (h2)
+{размер таблицы \\ строк: \texttt{int32}};
+\node[detail, below=0pt of h2] (h3)
+{число глобальных \\ переменных: \texttt{int32}};
+\node[detail, fill=green!17, below=0pt of h3] (h4)
+{число импортов: \texttt{int32}};
+\node[detail, below=0pt of h4] (h5)
+{число публичных\\символов: \texttt{int32}};
+\draw[attach] (header.west) -- (h3.east);
+
+\path coordinate (impaux) at ($(imports.south)+(-3.2,-1.65)$)
+    node[
+        field,
+        fill=green!17,
+        anchor=west,
+        label={[name=imp-label, align=center, font=\scriptsize, text width=42mm]center:
+            {смещение имени юнита\\в таблице строк\\\texttt{int32}}}
+    ] (impentry) at (impaux) {};
+\draw[attach] (imports.south) to[out=-90,in=90] (impentry.north);
+
+\path coordinate (pubaux) at ($(publics.north)+(-6.8,1.8)$)
+    node[
+        field,
+        anchor=west,
+        label={[name=pub-l1, align=center, font=\scriptsize, text width=29mm]center:
+            {смещение имени\\ в таблице строк \\\texttt{int32}}}
+    ] (pub1) at (pubaux) {}
+    node[
+        field,
+        anchor=west,
+        label={[name=pub-l2, align=center, font=\scriptsize, text width=29mm]center:
+            {адрес функции\\или индекс\\\texttt{int32}}}
+    ] (pub2) at (pub1.east) {}
+    node[
+        field,
+        fill=green!17,
+        anchor=west,
+        label={[name=pub-l3, align=center, font=\scriptsize, text width=29mm]center:
+            {флаг\\\texttt{uint8}}}
+    ] (pub3) at (pub2.east) {};
+\draw[attach] (publics.north) to[out=90,in=-90] (pub2.south);
+
+\end{tikzpicture}
